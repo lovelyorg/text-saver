@@ -36,12 +36,12 @@ app.use(
 // );
 
 app.use(
-  route.post("/file/:name", async (ctx, name) => {
+  route.post("/file/:name", async (ctx, user, name) => {
     if (new RegExp('[\\\\/:*?"<>|.]').test(name)) {
       ctx.body = "文件名不允许特殊字符";
       return;
     }
-    let filePath = `static/data/${name}`;
+    let filePath = `static/data/${user}/txt/${name}`;
     if (fs.existsSync(filePath)) {
       ctx.body = "文件已存在";
       return;
@@ -52,12 +52,12 @@ app.use(
       // 创建文件
       await writeFile(filePath, "");
       // 更新列表
-      let list = await readFile("static/data/list.json");
+      let list = await readFile(`static/data/${user}/conf/list`);
       list = list.toString();
       list = JSON.parse(list);
       list.files.push(name);
       let newList = JSON.stringify(list);
-      await writeFile("static/data/list.json", newList);
+      await writeFile(`static/data/${user}/conf/list`, newList);
     } catch (error) {
       msg = "创建文件失败";
     }
@@ -68,9 +68,6 @@ app.use(
 
 app.use(
   route.put("/:user/:name", async (ctx, user, name) => {
-    console.log(user)
-    console.log(name)
-
     if (!ctx.request.body.data) {
       ctx.body = "无数据";
       return;
@@ -86,23 +83,20 @@ app.use(
 );
 
 app.use(
-  route.delete("/file/:name", async (ctx, name) => {
-    let filePath = `static/data/${name}`;
-    await fs.unlink(filePath);
-
+  route.delete("/:user/:name", async (ctx, user, name) => {
+    await deleteFile(`static/data/${user}/txt/${name}`);
     let msg = "";
     try {
       // 更新列表
-      let list = await readFile("static/data/list.json");
+      let list = await readFile(`static/data/${user}/conf/list`);
       list = list.toString();
       list = JSON.parse(list);
-      list.files.remove(name);
+      list.remove(name);
       let newList = JSON.stringify(list);
-      await writeFile("static/data/list.json", newList);
+      await writeFile(`static/data/${user}/conf/list`, newList);
     } catch (error) {
       msg = "删除文件失败";
     }
-
     ctx.body = msg;
   })
 );
@@ -140,6 +134,15 @@ async function readFile(filename) {
 async function writeFile(filename, data) {
   return new Promise((s, j) => {
     fs.writeFile(filename, data, function (err) {
+      if (err) j(err);
+      s();
+    });
+  });
+}
+
+async function deleteFile(filename) {
+  return new Promise((s, j) => {
+    fs.unlink(filename, function (err) {
       if (err) j(err);
       s();
     });
