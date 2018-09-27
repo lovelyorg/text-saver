@@ -6,7 +6,7 @@ const fs = require("fs");
 const route = require("koa-route");
 const bodyparser = require("koa-bodyparser");
 
-Array.prototype.remove = function(val) {
+Array.prototype.remove = function (val) {
   var index = this.indexOf(val);
   if (index > -1) {
     this.splice(index, 1);
@@ -67,13 +67,16 @@ app.use(
 );
 
 app.use(
-  route.put("/file/:name", async (ctx, name) => {
+  route.put("/:user/:name", async (ctx, user, name) => {
+    console.log(user)
+    console.log(name)
+
     if (!ctx.request.body.data) {
       ctx.body = "无数据";
       return;
     }
     try {
-      await writeFile("static/data/" + name, ctx.request.body.data);
+      await writeFile(`static/data/${user}/txt/${name}`, ctx.request.body.data);
       uploadData();
     } catch (error) {
       msg = "更新失败";
@@ -127,7 +130,7 @@ function loopDirGetFilename(theDirPath, getfiles) {
 
 async function readFile(filename) {
   return new Promise((s, j) => {
-    fs.readFile(filename, function(err, data) {
+    fs.readFile(filename, function (err, data) {
       if (err) j(err);
       s(data);
     });
@@ -136,7 +139,7 @@ async function readFile(filename) {
 
 async function writeFile(filename, data) {
   return new Promise((s, j) => {
-    fs.writeFile(filename, data, function(err) {
+    fs.writeFile(filename, data, function (err) {
       if (err) j(err);
       s();
     });
