@@ -36,37 +36,6 @@ app.use(
 // );
 
 app.use(
-  route.post("/:user/:name", async (ctx, user, name) => {
-    if (new RegExp('[\\\\/:*?"<>|.]').test(name)) {
-      ctx.body = "文件名不允许特殊字符";
-      return;
-    }
-    let filePath = `static/data/${user}/txt/${name}`;
-    if (fs.existsSync(filePath)) {
-      ctx.body = "文件已存在";
-      return;
-    }
-
-    let msg = "";
-    try {
-      // 创建文件
-      await writeFile(filePath, "");
-      // 更新列表
-      let list = await readFile(`static/data/${user}/conf/list`);
-      list = list.toString();
-      list = JSON.parse(list);
-      list.push(name);
-      let newList = JSON.stringify(list);
-      await writeFile(`static/data/${user}/conf/list`, newList);
-    } catch (error) {
-      msg = "创建文件失败";
-    }
-
-    ctx.body = msg;
-  })
-);
-
-app.use(
   route.put("/:user", async (ctx, user) => {
     if (!ctx.request.body.data) {
       ctx.body = "无数据";
@@ -79,25 +48,6 @@ app.use(
       msg = "更新失败";
     }
     ctx.body = "";
-  })
-);
-
-app.use(
-  route.delete("/:user/:name", async (ctx, user, name) => {
-    await deleteFile(`static/data/${user}/txt/${name}`);
-    let msg = "";
-    try {
-      // 更新列表
-      let list = await readFile(`static/data/${user}/conf/list`);
-      list = list.toString();
-      list = JSON.parse(list);
-      list.remove(name);
-      let newList = JSON.stringify(list);
-      await writeFile(`static/data/${user}/conf/list`, newList);
-    } catch (error) {
-      msg = "删除文件失败";
-    }
-    ctx.body = msg;
   })
 );
 
