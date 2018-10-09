@@ -67,13 +67,13 @@ app.use(
 );
 
 app.use(
-  route.put("/:user/:name", async (ctx, user, name) => {
+  route.put("/:user", async (ctx, user) => {
     if (!ctx.request.body.data) {
       ctx.body = "无数据";
       return;
     }
     try {
-      await writeFile(`static/data/${user}/txt/${name}`, ctx.request.body.data);
+      await writeFile(`static/data/${user}/data`, ctx.request.body.data);
       uploadData();
     } catch (error) {
       msg = "更新失败";
