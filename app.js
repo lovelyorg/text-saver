@@ -43,7 +43,7 @@ app.use(
     }
     try {
       await writeFile(`static/data/${user}/data`, ctx.request.body.data)
-      //uploadData();
+      uploadData()
     } catch (error) {
       msg = '更新失败'
     }
