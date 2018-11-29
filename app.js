@@ -1,4 +1,4 @@
-const Koa = require('koa')
+﻿const Koa = require('koa')
 const app = new Koa()
 const path = require('path')
 const serve = require('koa-static')
@@ -51,7 +51,9 @@ app.use(
   })
 )
 
-app.listen(3333)
+const port=3333
+console.log(`app.listen:${port}`)
+app.listen(port)
 
 function uploadData() {
   var nodeCmd = require('node-cmd')
