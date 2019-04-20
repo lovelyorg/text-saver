@@ -1,5 +1,5 @@
 @ECHO ON  
-nodemon app.js
+npx nodemon app.js
 
 pause
 
